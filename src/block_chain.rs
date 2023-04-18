@@ -15,6 +15,7 @@ pub struct BlockChain {
 }
 
 impl BlockChain {
+    #[allow(dead_code)]
     pub fn new(path: &str) -> Result<Self, io::Error> {
         let mut file = OpenOptions::new()
             .read(true)
@@ -27,6 +28,7 @@ impl BlockChain {
         Ok(Self { len: 0, file })
     }
 
+    #[allow(dead_code)]
     pub fn from(path: &str) -> Result<Self, io::Error> {
         let mut file = OpenOptions::new()
             .read(true)
@@ -60,7 +62,7 @@ impl BlockChain {
 
     pub fn get<T> (&mut self, index: usize) -> Result<Option<T>, io::Error>
     where
-        T: Sized + Debug + Clone + Serialize + DeserializeOwned
+        T: Serialize + DeserializeOwned
     {
         let size = Block::<T>::size();
         let mut buf = vec![0; size];
@@ -71,9 +73,10 @@ impl BlockChain {
             self.file.seek(SeekFrom::Start(ptr as u64))?;
             self.file.read_exact(&mut buf)?;
 
-            let block = Block::<T>::deserialize(&buf).unwrap();
-            
-            Ok(Some(block.data.clone()))
+            match Block::<T>::deserialize(&buf) {
+                Ok(block) => Ok(Some(block.data)),
+                Err(_) => Ok(None)
+            }
         } else {
             Ok(None)
         }
