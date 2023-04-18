@@ -75,7 +75,7 @@ impl BlockChain {
 
             match Block::<T>::deserialize(&buf) {
                 Ok(block) => Ok(Some(block.data)),
-                Err(_) => Ok(None)
+                Err(_) => Err(io::Error::new(io::ErrorKind::Other, "Error deserializing block"))
             }
         } else {
             Ok(None)
