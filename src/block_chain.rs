@@ -56,7 +56,8 @@ impl BlockChain {
                 self.file.seek(SeekFrom::Start(0))?;
                 self.file.write_all(&new_len)
             },
-            _ => panic!("oporra")
+            (Err(_), Ok(_)) => Err(io::Error::new(io::ErrorKind::Other, "Error serializing block")),
+            _ => unreachable!()
         }
     }
 
